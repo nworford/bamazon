@@ -35,10 +35,26 @@ function viewByDept(){
         if(error){
             return console.error(error.message);
         }
-        console.log(sales);
+        var totalSales = new Map();
+        sales.forEach((sale) => {
+            if(!totalSales.has(sale.department_id)){
+                totalSales.set(sale.department_id, 0);
+            }
+            totalSales.set(sale.department_id, totalSales.get(sale.department_id) + sale.product_sales);
+        });
         connection.query("SELECT * FROM departments", (error, departments, fields) => {
-            console.log(departments);
-        })
+            if(error){
+                return console.log(error.message);
+            }
+            console.log("department_id\tdepartment_name\toverhead_costs\tproduct_sales\ttotal_profit");
+            departments.forEach((department) => {
+                var productSales = totalSales.get(department.department_id) || 0;
+                var totalProfit = productSales - department.over_head_costs;
+                var spacing = (department.department_name.length < 8) ? "\t\t\t" : "\t\t";
+                console.log(`\t${department.department_id}\t${department.department_name}${spacing}${department.over_head_costs}\t\t${productSales}\t\t${totalProfit}`);
+
+            });
+        });
         connection.end();
     });
     
