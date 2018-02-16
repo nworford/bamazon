@@ -42,13 +42,15 @@ function viewByDept(){
             }
             totalSales.set(sale.department_id, totalSales.get(sale.department_id) + sale.product_sales);
         });
+    
         connection.query("SELECT * FROM departments", (error, departments, fields) => {
             if(error){
                 return console.log(error.message);
             }
             console.log("department_id\tdepartment_name\toverhead_costs\tproduct_sales\ttotal_profit");
             departments.forEach((department) => {
-                var productSales = totalSales.get(department.department_id) || 0;
+
+                var productSales = totalSales.get(department.department_id.toString()) || 0;
                 var totalProfit = productSales - department.over_head_costs;
                 var spacing = (department.department_name.length < 8) ? "\t\t\t" : "\t\t";
                 console.log(`\t${department.department_id}\t${department.department_name}${spacing}${department.over_head_costs}\t\t${productSales}\t\t${totalProfit}`);
